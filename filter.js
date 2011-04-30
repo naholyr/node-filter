@@ -109,14 +109,22 @@ function filter_help(name)
 	var filter = get_filter(name);
 
 	console.info('Help for filter ' + name + ':');
-	console.info('| ' + (filter.description || 'No description available.'));
+	var filter_description = filter.description || 'No description \navailable';
+	var filter_description_lines = filter_description.split('\n');
+	for (var i=0; i<filter_description_lines.length; i++) {
+		console.info('|    ' + filter_description_lines[i]);
+	}
 	if (!filter.options) {
 		console.info('| This filter takes no option.');
 	} else {
 		console.info('| Options:');
 		for (var option in filter.options) {
-			var d = filter.options[option].description;
-			console.info('|  * ' + option + ': ' + (filter.options[option].description || 'No description') + ' (default value = ' + (filter.options[option].default || 'null') + ')');
+			var description = filter.options[option].description;
+			var default_val = filter.options[option].default;
+			if (typeof default_val == 'undefined') {
+				default_val = null;
+			}
+			console.info('|  * ' + option + ': ' + (description || 'No description') + ' (default value = ' + JSON.stringify(default_val) + ')');
 		}
 	}
 }
