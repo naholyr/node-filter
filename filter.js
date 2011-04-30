@@ -1,3 +1,21 @@
+/*
+
+Format of a fully described filter:
+
+{
+	"description": "description of the filter, used by help()", // Optional
+	"callback":    validation_function,
+	"options":     { // Optional
+		// List of available options, with the following formats
+		"option's name": {
+			"description": "description of the option, used by help()", // Optional
+			"default": default_value // Optional
+		}…
+	}
+}
+
+*/
+
 // private
 var filters = {};
 
@@ -27,16 +45,13 @@ function load_filters_from_module(module_name)
 	}
 }
 
+
 /**
  *
  */
 function filter_add(name, filter, options)
 {
 	var overwritten = typeof filters[name] != 'undefined';
-
-	if (typeof options == 'undefined') {
-		options = [];
-	}
 
 	// Usage: (name, callback [, options])
 	if (typeof filter == 'function') {
@@ -59,14 +74,10 @@ function filter_add(name, filter, options)
 		}
 		if (typeof filter.options == 'undefined') {
 			filter.options = options;
-		} else {
-			for (var i=0; i<options.length; i++) {
-				if (filter.options.indexOf(options[i]) == -1) {
-					filter.options.push(options[i]);
-				}
-			}
 		}
 	}
+
+	filters[name] = filter;
 
 	return !overwritten;
 }
@@ -87,9 +98,29 @@ function filter_list()
 /**
  *
  */
-function filter_help()
+function filter_help(name)
 {
-	throw new Error('Not Implemented Yet');
+	if (typeof name == 'undefined') {
+		throw new Error('Specify the filter you need help about, one of ' + filter_list());
+	}
+
+	if (!filters[name]) {
+		throw new Error('Invalid filter. Choose one of ' + filter_list());
+	}
+
+	console.info('Help for filter ' + name + ':');
+
+	var filter = filters[name];
+	console.info('| ' + (filter.description || 'No description available.'));
+	if (!filter.options) {
+		console.info('| This filter takes no option.');
+	} else {
+		console.info('| Options:');
+		for (var option in filter.options) {
+			var d = filter.options[option].description;
+			console.info('|  * ' + option + ': ' + (filter.options[option].description || 'No description') + ' (default value = ' + (filter.options[option].default || 'null') + ')');
+		}
+	}
 }
 
 /**
