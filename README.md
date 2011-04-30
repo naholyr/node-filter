@@ -71,6 +71,7 @@ string
 This filter will be used to validate and cleanup strings.
 
 *Available options*:
+
 * **min**: Minimum length (default value = 0)
 * **max**: Maximum length (default value = null)
 * **pattern**: Regexp that should be matched (default value = null)
@@ -126,6 +127,7 @@ It will be used this way:
     console.log(filter.sanitize(3, {added: 4})) // → 7
 
 *Note*:
+
 * Calling a filter with options it did not declare will raise an error.
 * If an option is not provided, your callback will get its default value (null if none was specified).
 
@@ -141,6 +143,7 @@ If you wrote it as a module, you can use the module's name:
     filter.add('my_filter', './my_filter_module')
 
 But you could prefer to let the filters declare themselves:
+
 * Create a module named <code>enabled_filters</code> in current working directory.
 * This module will return a list of your own filters, format <code>{ name: filter }</code>.
 
