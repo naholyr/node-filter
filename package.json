@@ -1,5 +1,5 @@
 {
-  "name": "filter",
+  "name": "node-filter",
   "description": "Validation and sanitization API inspired from PHP's filters",
   "version": "0.0.1",
   "homepage": "https://github.com/naholyr/node-filter",
@@ -8,7 +8,7 @@
     "url": "git://github.com/naholyr/node-filter.git"
   },
   "author": "Nicolas Chambrier <naholyr@gmail.com> (http://naholyr.fr)",
-  "main": "filter.js",
+  "main": "index.js",
   "directories": {
     "lib": "."
   },
