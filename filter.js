@@ -4,13 +4,15 @@ Format of a fully described filter:
 
 {
 	"description": "description of the filter, used by help()", // Optional
-	"callback":    validation_function,
-	"options":     { // Optional
+	"validate":    validation_function,                         // Mandatory
+	"sanitize":    sanitization_function,                       // Optional, default callback is used if not defined
+	"options":     {                                            // Optional
 		// List of available options, with the following formats
 		"option's name": {
 			"description": "description of the option, used by help()", // Optional
-			"default": default_value // Optional
-		}…
+			"default":     default_value                                // Optional
+		},
+		…
 	}
 }
 
@@ -56,7 +58,7 @@ function filter_add(name, filter, options)
 	// Usage: (name, callback [, options])
 	if (typeof filter == 'function') {
 		filter = {
-			'callback': filter,
+			'validate': filter,
 			'options':  options,
 		};
 	}
@@ -67,10 +69,10 @@ function filter_add(name, filter, options)
 		return filter_add(name, require(filter), options);
 	}
 
-	// Usage: (name, {"callback":… [, "options":…]} [, options])
+	// Usage: (name, {"validate":… [, "options":…]} [, options])
 	else if (typeof filter == 'object') {
-		if (typeof filter.callback == 'undefined') {
-			throw new Error("Invalid filter: required field 'callback'");
+		if (typeof filter.validate == 'undefined') {
+			throw new Error("Invalid filter: required field 'validate'");
 		}
 		if (typeof filter.options == 'undefined') {
 			filter.options = options;
@@ -104,13 +106,9 @@ function filter_help(name)
 		throw new Error('Specify the filter you need help about, one of ' + filter_list());
 	}
 
-	if (!filters[name]) {
-		throw new Error('Invalid filter. Choose one of ' + filter_list());
-	}
+	var filter = get_filter(name);
 
 	console.info('Help for filter ' + name + ':');
-
-	var filter = filters[name];
 	console.info('| ' + (filter.description || 'No description available.'));
 	if (!filter.options) {
 		console.info('| This filter takes no option.');
@@ -126,17 +124,83 @@ function filter_help(name)
 /**
  *
  */
-function filter_validate()
+function get_filter(filter)
 {
-	throw new Error('Not Implemented Yet');
+	if (typeof filter == 'object') {
+		return filter;
+	}
+
+	if (!filters[filter]) {
+		throw new Error('Unknown filter "' + filter + '". Known filters: ' + filter_list());
+	}
+
+	return filters[filter];
 }
 
 /**
  *
  */
-function filter_sanitize()
+function get_filled_options(filter, options)
 {
-	throw new Error('Not Implemented Yet');
+	filter = get_filter(filter);
+	var opts = {};
+	for (var option in filter.options) {
+		opts[option] = filter.options[option].default || null;
+	}
+	for (var option in options) {
+		if (typeof opts[option] == 'undefined') {
+			throw new Error('Invalid option "' + option + '" for filter "' + name + '"');
+		}
+		opts[option] = options[option];
+	}
+
+	return opts;
+}
+
+/**
+ *
+ */
+function filter_validate(value, filter, options, callback)
+{
+	filter = get_filter(filter, options);
+	options = get_filled_options(filter, options);
+
+	if (typeof callback == 'undefined') {
+		filter.validate(value, options);
+	} else {
+		setTimeout(function() {
+			var err = undefined;
+			try {
+				filter.validate(value, options);
+			} catch (e) {
+				err = e;
+			}
+			callback(err, value);
+		}, 0);
+	}
+}
+
+/**
+ *
+ */
+function filter_sanitize(value, filter, options, callback)
+{
+	filter = get_filter(filter, options);
+	options = get_filled_options(filter, options);
+
+	if (typeof callback == 'undefined') {
+		return (filter.sanitize || filter.validate)(value, options);
+	} else {
+		setTimeout(function() {
+			var err = undefined, sanitized = undefined;
+			try {
+				sanitized = (filter.sanitize || filter.validate)(value, options);
+			} catch (e) {
+				err = e;
+			}
+			callback(err, sanitized, value);
+		}, 0);
+	}
 }
 
 

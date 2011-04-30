@@ -1,6 +1,9 @@
 exports.description = "This filter does nothing";
 
-exports.callback = function(value) {
+exports.validate = function(value, options) {
+};
+
+exports.sanitize = function(value, options) {
 	return value;
 };
 
