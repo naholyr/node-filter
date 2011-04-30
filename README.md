@@ -47,12 +47,12 @@ Help
 
     filter.help('string')
 
-> Help for filter string:
-> |    Standard string validations
-> | Options:
-> |  * min: Minimum length (default value = 0)
-> |  * max: Maximum length (default value = null)
-> |  * pattern: Regexp that should be matched (default value = null)
+> Help for filter string:<br/>
+> |    Standard string validations<br/>
+> | Options:<br/>
+> |  * min: Minimum length (default value = 0)<br/>
+> |  * max: Maximum length (default value = null)<br/>
+> |  * pattern: Regexp that should be matched (default value = null)<br/>
 > |  * replace: Replacement for given pattern, used for sanitization only (default value = null)
 
 Available filters
